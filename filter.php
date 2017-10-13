@@ -72,11 +72,31 @@ class filter
 	private function pumpkin_mouth()
 	{
 		$base = $this->get_blank_base();
-		$mirror = $this->load_image("filter_layers/pumpkin.png");
+		$mouth = $this->load_image("filter_layers/pumpkin.png");
 		
 		imagefilter($this->photo, IMG_FILTER_BRIGHTNESS, -100);
 		imagecopyresampled($base, $this->photo, $this::WIDTH * 0.17 , $this::HEIGHT * 0.3, 0, 0, $this::WIDTH / 1.5, $this::HEIGHT / 1.6, $this::WIDTH, $this::HEIGHT);
-		imagecopyresampled($base, $mirror, 0, 0, 0, 0, $this::WIDTH, $this::HEIGHT, $this::WIDTH, $this::HEIGHT);
+		imagecopyresampled($base, $mouth, 0, 0, 0, 0, $this::WIDTH, $this::HEIGHT, $this::WIDTH, $this::HEIGHT);
+		
+		return $base;
+	}
+	
+	private function party()
+	{
+		$base =$this->photo;
+		$party = $this->load_image("filter_layers/party.png");
+		
+		imagecopyresampled($base, $party, 0, 0, 0, 0, $this::WIDTH, $this::HEIGHT, $this::WIDTH, $this::HEIGHT);
+		
+		return $base;
+	}
+	
+	private function autumn()
+	{
+		$base =$this->photo;
+		$autumn = $this->load_image("filter_layers/autumn.png");
+		
+		imagecopyresampled($base, $autumn, 0, 0, 0, 0, $this::WIDTH, $this::HEIGHT, $this::WIDTH, $this::HEIGHT);
 		
 		return $base;
 	}
@@ -165,6 +185,6 @@ class filter
 }
 
 $filter = new filter($argv[1]);
-$filter->apply_filter('pumpkin_mouth');
+$filter->apply_filter('autumn');
 
 
