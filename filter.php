@@ -44,6 +44,18 @@ class filter
 		return $base;
 	}
 	
+	private function edge()
+	{
+		$base = $this->get_blank_base();
+		
+		imagecopyresampled($base, $this->photo, 0, 0, 0, 0, $this::WIDTH, $this::HEIGHT, $this::WIDTH, $this::HEIGHT);
+		imagefilter($base, IMG_FILTER_EDGEDETECT);
+		imagefilter($base, IMG_FILTER_CONTRAST, 10);
+		imagefilter($base, IMG_FILTER_BRIGHTNESS, -50);
+		
+		return $base;
+	}
+	
 	private function tv()
 	{
 		$base = $this->get_blank_base();
@@ -242,6 +254,6 @@ class filter
 }
 
 $filter = new filter($argv[1]);
-$filter->apply_filter('sepia');
+$filter->apply_filter('edge');
 
 
