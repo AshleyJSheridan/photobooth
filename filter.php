@@ -83,7 +83,7 @@ class filter
 	
 	private function party()
 	{
-		$base =$this->photo;
+		$base = $this->photo;
 		$party = $this->load_image("filter_layers/party.png");
 		
 		imagecopyresampled($base, $party, 0, 0, 0, 0, $this::WIDTH, $this::HEIGHT, $this::WIDTH, $this::HEIGHT);
@@ -93,12 +93,69 @@ class filter
 	
 	private function autumn()
 	{
-		$base =$this->photo;
+		$base = $this->photo;
 		$autumn = $this->load_image("filter_layers/autumn.png");
 		
 		imagecopyresampled($base, $autumn, 0, 0, 0, 0, $this::WIDTH, $this::HEIGHT, $this::WIDTH, $this::HEIGHT);
 		
 		return $base;
+	}
+	
+	private function sepia()
+	{
+		$base = $this->photo;
+		
+		imagefilter($base, IMG_FILTER_GRAYSCALE);
+		imagefilter($base, IMG_FILTER_BRIGHTNESS, -30);
+		imagefilter($base, IMG_FILTER_COLORIZE, 90, 60, 40);
+		
+		$base = $this->vignette($base);
+		imagefilter($base, IMG_FILTER_GAUSSIAN_BLUR);
+		
+		return $base;
+	}
+	
+	
+	private function vignette($img)
+	{
+		$sharp = 0.4; // 0 - 10 smaller is sharper,
+		$level = 0.7; // 0 - 1 smaller is brighter
+		$skip_pixels = 2;
+		
+		for($x = 0; $x < $this::WIDTH; $x += $skip_pixels)
+		{
+			for($y = 0; $y < $this::HEIGHT; $y += $skip_pixels)
+			{
+				$rgb = imagecolorat($this->photo, $x, $y);
+
+				$red = (($rgb >> 16) & 0xFF);
+				$green = (($rgb >> 8) & 0xFF);
+				$blue = ($rgb & 0xFF);
+
+				/*$l = sin(M_PI / $this::WIDTH * $x) * sin(M_PI / $this::HEIGHT * $y);
+				$l = pow($l, $sharp);
+				$l = 1 - $level * (1 - $l);*/
+				$l = $this->get_vignette_colour_modifier($x, $y, $sharp, $level);
+
+				$red *= $l;
+				$green *= $l;
+				$blue *= $l;
+				
+				$color = imagecolorallocate($img, $red, $green, $blue);
+
+				imagesetpixel($img, $x, $y, $color);
+			}
+		}
+		return $img;
+	}
+	
+	private function get_vignette_colour_modifier($x, $y, $sharpness, $brightness)
+	{
+		$l = sin(M_PI / $this::WIDTH * $x) * sin(M_PI / $this::HEIGHT * $y);
+		$l = pow($l, $sharpness);
+		$l = 1 - $brightness * (1 - $l);
+		
+		return $l;
 	}
 	
 	private function oil()
@@ -185,6 +242,6 @@ class filter
 }
 
 $filter = new filter($argv[1]);
-$filter->apply_filter('autumn');
+$filter->apply_filter('sepia');
 
 
